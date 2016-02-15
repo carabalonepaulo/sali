@@ -21,9 +21,9 @@ end
 Episode = {}
 Episode.__index = Episode
 
-function Episode:new(number, url)
+function Episode:new(number, title, url)
     local self = {}
-    self.title = ''
+    self.title = title
     self.number = number
     self.url = url
     return setmetatable(self, Episode)

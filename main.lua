@@ -40,15 +40,13 @@ end
 -- @param   url     URL do anime
 -- @return  table
 --
-function SuperAnimes:getepisodelist(url)
+function SuperAnimes:getepisodelist(url, page)
     if url:sub(-1, -1) == '/' then url = url:sub(0, -2) end
-    local r, c = http.request(url)
+    local r, c = http.request(url..'?&pagina='..page)
     local name = url:match('http://www.superanimes.com/([^/]+)/?')
-    local episodes = r:match('numberofEpisodes">(%d+)<')
     local list, count = {}, 1
-    for i = 1, episodes do table.insert(list, Episode:new(i, url..'/episodio-'..i)) end
     for i in r:gmatch('<h3 itemprop="name">([^>]+)</h3>') do
-        list[count].title = i
+        table.insert(list, Episode:new(count, i, url..'/episodio-'..count))
         count = count + 1
     end
     return list
@@ -80,14 +78,18 @@ function SuperAnimes:getvideourl(episodeurl)
         sink = ltn12.sink.table(response)
     }
     local resp = table.concat(response)
-    return resp:match('<source src="(.+)" type=')
+    local video = resp:match('<source src="(.+)" type=')
+    if video:match('superanimes') then
+        local r, c, h = http.request { method = 'HEAD', url = video }
+        return h['location'] or video
+    else return video end
 end
 
 -- instancia o obeto de abstração do site
-local salayer = SuperAnimes:new()
+local layer = SuperAnimes:new()
 -- pesquisa por "naruto"
-local result = salayer:search('naruto')
+local result = layer:search('naruto')
 -- obtém a lista de episódios do primeiro resultado da busca
-local episodes = salayer:getepisodelist(result[1].url)
+local episodes = layer:getepisodelist(result[1].url, 1)
 -- obtém a url direta do primeiro episódio do anime
-local videourl = salayer:getvideourl(episodes[1].url)
+local videourl = layer:getvideourl(episodes[1].url)
