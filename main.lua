@@ -46,7 +46,8 @@ function SuperAnimes:getepisodelist(url, page)
     local name = url:match('http://www.superanimes.com/([^/]+)/?')
     local list, count = {}, 1
     for i in r:gmatch('<h3 itemprop="name">([^>]+)</h3>') do
-        table.insert(list, Episode:new(count, i, url..'/episodio-'..count))
+        local cb = (page * 20) + count - 20
+        table.insert(list, Episode:new(cb, i, url..'/episodio-'..cb))
         count = count + 1
     end
     return list
@@ -90,6 +91,6 @@ local layer = SuperAnimes:new()
 -- pesquisa por "naruto"
 local result = layer:search('naruto')
 -- obtém a lista de episódios do primeiro resultado da busca
-local episodes = layer:getepisodelist(result[1].url, 1)
+local episodes = layer:getepisodelist(result[1].url, 3)
 -- obtém a url direta do primeiro episódio do anime
 local videourl = layer:getvideourl(episodes[1].url)
