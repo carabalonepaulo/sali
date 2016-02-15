@@ -131,7 +131,7 @@ function SuperAnimes:loadanimeinfo(searchitem)
     info.author = r:match('itemprop="author">([^>]+)</span>')
     info.director = r:match('itemprop="director">([^>]+)</span>')
     info.company = r:match('itemprop="productionCompany">([^>]+)</span>')
-    info.lastepisode = r:match('itemprop="numberOfEpisodes">([^>]+)</span>')
+    info.lastepisode = r:match('itemprop="numberofEpisodes">(%d+)</span>')
     info.year = r:match('itemprop="copyrightYear">([^>]+)</span>')
     return info
 end
@@ -145,4 +145,4 @@ local anime = layer:loadanimeinfo(result[1])
 -- obtém a lista de episódios do primeiro resultado da busca
 local episodes = layer:getepisodelist(anime.url, 1)
 -- obtém a url direta do primeiro episódio do anime
-local videourl = layer:getvideourl(anime.url)
+local videourl = layer:getvideourl(episodes[1].url)
